@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Slice: ภารกิจสับเศษส่วนนีออน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Prompt:wght@400;600;700;800&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      
+      --neon-cyan: #06b6d4;
+      --neon-cyan-glow: rgba(6, 182, 212, 0.45);
+      --neon-pink: #f43f5e;
+      --neon-pink-glow: rgba(244, 63, 94, 0.45);
+      --neon-amber: #f59e0b;
+      --neon-green: #10b981;
+      --neon-green-glow: rgba(16, 185, 129, 0.5);
+
+      --text-main: #f3f4f6;
+      --text-muted: #94a3b8;
+      --font-display: 'Chakra Petch', sans-serif;
+      --font-body: 'Prompt', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12), transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .header-bar {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .header-bar h1 {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, var(--neon-cyan), #38bdf8, var(--neon-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(6, 182, 212, 0.3);
+    }
+    .header-bar p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0.2rem;
+    }
+
+    .badge-stage {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--neon-amber);
+      color: var(--neon-amber);
+      font-family: var(--font-display);
+      font-weight: 700;
+      padding: 0.3rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      margin-top: 0.6rem;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .main-board {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      width: 100%;
+      max-width: 880px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .status-banner {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid var(--neon-cyan);
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      text-align: center;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      font-size: 1rem;
+      text-shadow: 0 0 10px var(--neon-cyan-glow);
+      transition: all 0.3s ease;
+    }
+    .status-banner.ready {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--neon-green);
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green-glow);
+    }
+
+    .pan-container {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    @media (max-width: 740px) {
+      .pan-container { grid-template-columns: 1fr; }
+      .plus-sign { display: none; }
+    }
+
+    .pan-card {
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+      position: relative;
+    }
+    .pan-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .pizza-canvas {
+      width: 195px;
+      height: 195px;
+      filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.8));
+    }
+
+    .plus-sign {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .slice-control {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: #141d2d;
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid #233149;
+    }
+    .btn-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #ffffff;
+      transition: all 0.15s ease;
+    }
+    .btn-circle.minus {
+      background: #be123c;
+      border-color: #f43f5e;
+    }
+    .btn-circle.minus:hover { box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
+    .btn-circle.plus {
+      background: #0284c7;
+      border-color: #38bdf8;
+    }
+    .btn-circle.plus:hover { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+    .btn-circle:disabled { opacity: 0.25; cursor: not-allowed; }
+
+    .control-label {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .control-label strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--text-main);
+    }
+
+    .fraction-preview {
+      background: #090e17;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 0.5rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+    .frac .top { border-bottom: 2px solid currentColor; padding: 0 2px; }
+    .frac .bottom { padding: 0 2px; }
+
+    .btn-merge {
+      background: #1e293b;
+      color: #64748b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.05rem;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      width: 100%;
+      cursor: not-allowed;
+      letter-spacing: 1px;
+      transition: all 0.25s ease;
+    }
+    .btn-merge.ready {
+      background: linear-gradient(135deg, #059669, #10b981);
+      border-color: var(--neon-green);
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 20px var(--neon-green-glow);
+    }
+    .btn-merge.ready:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(16, 185, 129, 0.7);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(4, 7, 13, 0.85);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+    }
+    .modal-box {
+      background: #111827;
+      border: 1px solid var(--neon-green);
+      border-radius: 16px;
+      padding: 2.2rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      box-shadow: 0 0 35px var(--neon-green-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <h1>CYBER SLICE: ภารกิจสับเศษส่วน</h1>
+    <p>ปรับความถี่ใบมีดเลเซอร์ (x Multiplier) เพื่อซอยชิ้นส่วนให้เท่ากันก่อนรวมกล่องพลังงาน</p>
+    <div class="badge-stage" id="stage-badge">SECTOR: 1/3</div>
+  </div>
+
+  <div class="main-board">
+    <div class="status-banner" id="status-banner">
+      ความถี่ไม่ตรงกัน! ซอยขนาดชิ้นส่วนให้มีตัวส่วนเท่ากันก่อนเชื่อมต่อ
+    </div>
+
+    <div class="pan-container">
+      <!-- Pan 1 -->
+      <div class="pan-card">
+        <h3>CELL 01 [CYAN]</h3>
+        <canvas id="pizza1" width="195" height="195" class="pizza-canvas"></canvas>
+        
+        <div class="slice-control">
+          <button class="btn-circle minus" onclick="changeCut(1, -1)">-</button>
+          <div class="control-label">
+            ใบมีดสับ
+            <strong id="mult1-val">x 1</strong>
+          </div>
+          <button class="btn-circle plus" onclick="changeCut(1, 1)">+</button>
+        </div>
+
+        <div class="fraction-preview">
+          <div class="frac" style="color:var(--neon-cyan);"><span class="top" id="p1-base-num">1</span><span class="bottom" id="p1-base-den">2</span></div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">TRANSFORM</span>
+          <div class="frac" style="color:var(--text-main);"><span class="top" id="p1-trans-num">1</span><span class="bottom" id="p1-trans-den">2</span></div>
+        </div>
+      </div>
+
+      <div class="plus-sign">+</div>
+
+      <!-- Pan 2 -->
+      <div class="pan-card">
+        <h3>CELL 02 [PINK]</h3>
+        <canvas id="pizza2" width="195" height="195" class="pizza-canvas"></canvas>
+        
+        <div class="slice-control">
+          <button class="btn-circle minus" onclick="changeCut(2, -1)">-</button>
+          <div class="control-label">
+            ใบมีดสับ
+            <strong id="mult2-val">x 1</strong>
+          </div>
+          <button class="btn-circle plus" onclick="changeCut(2, 1)">+</button>
+        </div>
+
+        <div class="fraction-preview">
+          <div class="frac" style="color:var(--neon-pink);"><span class="top" id="p2-base-num">1</span><span class="bottom" id="p2-base-den">3</span></div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">TRANSFORM</span>
+          <div class="frac" style="color:var(--text-main);"><span class="top" id="p2-trans-num">1</span><span class="bottom" id="p2-trans-den">3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-merge" id="merge-btn" onclick="openMergeModal()">
+      รวมกล่องพลังงาน! (ต้องการขนาดชิ้นเท่ากัน)
+    </button>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+      <h2 style="font-family:var(--font-display); color:var(--neon-green); font-size:1.6rem; letter-spacing:1px;">
+        SYNCHRONIZED COMPLETED!
+      </h2>
+      <canvas id="pizza-merged" width="200" height="200" class="pizza-canvas"></canvas>
+      <div id="modal-math-text" style="font-family:var(--font-display); font-size:1.35rem; font-weight:700; color:var(--text-main);"></div>
+      <p id="modal-insight" style="font-size:0.95rem; color:var(--text-muted); line-height:1.5;"></p>
+      <button class="btn-merge ready" style="padding:0.85rem;" onclick="nextStage()">สู่ด่านถัดไป (NEXT SECTOR)</button>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      { id: 1, p1: { num: 1, den: 2, col: '#06b6d4', glow: 'rgba(6, 182, 212, 0.6)' }, p2: { num: 1, den: 3, col: '#f43f5e', glow: 'rgba(244, 63, 94, 0.6)' } },
+      { id: 2, p1: { num: 1, den: 4, col: '#06b6d4', glow: 'rgba(6, 182, 212, 0.6)' }, p2: { num: 1, den: 2, col: '#f43f5e', glow: 'rgba(244, 63, 94, 0.6)' } },
+      { id: 3, p1: { num: 1, den: 3, col: '#06b6d4', glow: 'rgba(6, 182, 212, 0.6)' }, p2: { num: 1, den: 6, col: '#f43f5e', glow: 'rgba(244, 63, 94, 0.6)' } }
+    ];
+
+    let currentStageIdx = 0;
+    let mult1 = 1;
+    let mult2 = 1;
+
+    function drawPizzaSlice(canvasId, totalSlices, activeSlices, sliceColor, glowColor) {
+      const cvs = document.getElementById(canvasId);
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = w * 0.41;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Outer Neon Ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Reactor Plate Base
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#0a101d';
+      ctx.fill();
+
+      // Slices
+      const step = (Math.PI * 2) / totalSlices;
+      for (let i = 0; i < totalSlices; i++) {
+        const start = i * step - Math.PI / 2;
+        const end = start + step;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+
+        if (i < activeSlices) {
+          ctx.fillStyle = sliceColor;
+          ctx.shadowColor = glowColor;
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.strokeStyle = '#1f293d';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Center Core
+      ctx.beginPath();
+      ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    function updateView() {
+      const stage = STAGES[currentStageIdx];
+      document.getElementById('stage-badge').innerText = `SECTOR: ${stage.id}/3`;
+
+      document.getElementById('p1-base-num').innerText = stage.p1.num;
+      document.getElementById('p1-base-den').innerText = stage.p1.den;
+      document.getElementById('p2-base-num').innerText = stage.p2.num;
+      document.getElementById('p2-base-den').innerText = stage.p2.den;
+
+      document.getElementById('mult1-val').innerText = `x ${mult1}`;
+      document.getElementById('mult2-val').innerText = `x ${mult2}`;
+
+      const curDen1 = stage.p1.den * mult1;
+      const curNum1 = stage.p1.num * mult1;
+      const curDen2 = stage.p2.den * mult2;
+      const curNum2 = stage.p2.num * mult2;
+
+      document.getElementById('p1-trans-num').innerText = curNum1;
+      document.getElementById('p1-trans-den').innerText = curDen1;
+      document.getElementById('p2-trans-num').innerText = curNum2;
+      document.getElementById('p2-trans-den').innerText = curDen2;
+
+      drawPizzaSlice('pizza1', curDen1, curNum1, stage.p1.col, stage.p1.glow);
+      drawPizzaSlice('pizza2', curDen2, curNum2, stage.p2.col, stage.p2.glow);
+
+      const banner = document.getElementById('status-banner');
+      const mergeBtn = document.getElementById('merge-btn');
+
+      if (curDen1 === curDen2) {
+        banner.className = 'status-banner ready';
+        banner.innerText = `[LOCKED] ความถี่ตรงกันสมบูรณ์! (หน่วย 1/${curDen1} เท่ากัน) กดเชื่อมต่อได้ทันที`;
+        mergeBtn.className = 'btn-merge ready';
+        mergeBtn.innerText = `รวมกล่องพลังงาน! (${curNum1}/${curDen1} + ${curNum2}/${curDen2})`;
+      } else {
+        banner.className = 'status-banner';
+        banner.innerText = `ขนาดหน่วยย่อยยังไม่ตรงกัน! (1/${curDen1} vs 1/${curDen2}) ลองเพิ่มใบมีดสับ (x)`;
+        mergeBtn.className = 'btn-merge';
+        mergeBtn.innerText = 'รวมกล่องพลังงาน! (ต้องการขนาดชิ้นเท่ากัน)';
+      }
+    }
+
+    function changeCut(pan, delta) {
+      if (pan === 1) mult1 = Math.max(1, Math.min(6, mult1 + delta));
+      else mult2 = Math.max(1, Math.min(6, mult2 + delta));
+      updateView();
+    }
+
+    function openMergeModal() {
+      const stage = STAGES[currentStageIdx];
+      const curDen1 = stage.p1.den * mult1;
+      const curDen2 = stage.p2.den * mult2;
+      if (curDen1 !== curDen2) return;
+
+      const totalDen = curDen1;
+      const curNum1 = stage.p1.num * mult1;
+      const curNum2 = stage.p2.num * mult2;
+      const sumNum = curNum1 + curNum2;
+
+      const cvs = document.getElementById('pizza-merged');
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width, h = cvs.height, cx = w/2, cy = h/2, r = w*0.41;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = '#0a101d';
+      ctx.fill();
+
+      const step = (Math.PI * 2) / totalDen;
+      for (let i = 0; i < totalDen; i++) {
+        const start = i * step - Math.PI / 2;
+        const end = start + step;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+
+        if (i < curNum1) {
+          ctx.fillStyle = stage.p1.col;
+          ctx.shadowColor = stage.p1.glow;
+          ctx.shadowBlur = 8;
+          ctx.fill();
+        } else if (i < sumNum) {
+          ctx.fillStyle = stage.p2.col;
+          ctx.shadowColor = stage.p2.glow;
+          ctx.shadowBlur = 8;
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#1f293d';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      document.getElementById('modal-math-text').innerText = `${curNum1}/${totalDen} + ${curNum2}/${totalDen} = ${sumNum}/${totalDen} ถาด`;
+      document.getElementById('modal-insight').innerText = `เมื่อแบ่งให้ขนาดชิ้นเท่ากันแล้ว สามารถนำจำนวนชิ้นมาบวกกันได้ทันที โดยไม่เกิดการสูญเสียปริมาณรวม!`;
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function nextStage() {
+      document.getElementById('modal-overlay').style.display = 'none';
+      currentStageIdx = (currentStageIdx + 1) % STAGES.length;
+      mult1 = 1;
+      mult2 = 1;
+      updateView();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateView();
+    });
+  </script>
+</body>
+</html>
